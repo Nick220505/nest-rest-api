@@ -3,8 +3,12 @@ import { Item } from './interfaces/item.interface';
 
 @Injectable()
 export class ItemsService {
-  private items: Item[] = [];
-  private idCounter = 1;
+  private items: Item[] = [
+    { id: '1', name: 'Laptop', quantity: 5, description: 'Dell XPS 13' },
+    { id: '2', name: 'Mouse', quantity: 20, description: 'Wireless mouse' },
+    { id: '3', name: 'Keyboard', quantity: 10, description: 'Mechanical keyboard' },
+  ];
+  private idCounter = 4;
 
   async findAll(): Promise<Item[]> {
     return this.items;

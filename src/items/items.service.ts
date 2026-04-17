@@ -1,30 +1,41 @@
 import { Injectable } from '@nestjs/common';
 import { Item } from './interfaces/item.interface';
-import { Model } from 'mongoose';
-import { InjectModel } from '@nestjs/mongoose';
 
 @Injectable()
 export class ItemsService {
-  constructor(@InjectModel('Item') private readonly itemModel: Model<Item>) {}
+  private items: Item[] = [];
+  private idCounter = 1;
 
   async findAll(): Promise<Item[]> {
-    return await this.itemModel.find();
+    return this.items;
   }
 
   async findOne(id: string): Promise<Item | null> {
-    return await this.itemModel.findOne({ _id: id });
+    return this.items.find(item => item.id === id) || null;
   }
 
   async create(item: Item): Promise<Item> {
-    const newItem = new this.itemModel(item);
-    return await newItem.save();
+    const newItem: Item = {
+      ...item,
+      id: String(this.idCounter++),
+    };
+    this.items.push(newItem);
+    return newItem;
   }
 
   async update(id: string, item: Item): Promise<Item | null> {
-    return await this.itemModel.findByIdAndUpdate(id, item, { new: true });
+    const index = this.items.findIndex(i => i.id === id);
+    if (index === -1) return null;
+    const updatedItem = { ...item, id };
+    this.items[index] = updatedItem;
+    return updatedItem;
   }
 
   async delete(id: string): Promise<Item | null> {
-    return await this.itemModel.findByIdAndDelete(id);
+    const index = this.items.findIndex(i => i.id === id);
+    if (index === -1) return null;
+    const deletedItem = this.items[index];
+    this.items.splice(index, 1);
+    return deletedItem;
   }
 }
